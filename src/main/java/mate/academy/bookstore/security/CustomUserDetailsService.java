@@ -2,6 +2,7 @@ package mate.academy.bookstore.security;
 
 import lombok.RequiredArgsConstructor;
 import mate.academy.bookstore.repository.user.UserRepository;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -9,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
+@EnableMethodSecurity
 public class CustomUserDetailsService implements UserDetailsService {
     private final UserRepository userRepository;
 
@@ -16,6 +18,7 @@ public class CustomUserDetailsService implements UserDetailsService {
     public UserDetails loadUserByUsername(String email)
             throws UsernameNotFoundException {
         return userRepository.findByEmail(email)
-                .orElseThrow(() -> new UsernameNotFoundException("Can't find user be email"));
+                .orElseThrow(() -> new UsernameNotFoundException("Can't find "
+                        + "user by email:" + email));
     }
 }

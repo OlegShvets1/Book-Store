@@ -31,15 +31,12 @@ public class UserRegistrationRequestDto {
 
     @NotBlank
     @Size(min = 8, max = 50)
-    @NotNull
     private String repeatPassword;
 
     @NotBlank
-    @NotNull
     private String firstName;
 
     @NotBlank
-    @NotNull
     private String lastName;
 
     private String shippingAddress;
