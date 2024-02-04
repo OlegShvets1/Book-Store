@@ -35,10 +35,13 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
     @Override
     public ShoppingCartDto findShoppingCart(Authentication authentication, Pageable pageable) {
         User user = (User) authentication.getPrincipal();
+
         ShoppingCart shoppingCart = shoppingCartRepository.findByUserId(user.getId())
-                .orElseThrow(() -> new EntityNotFoundException(
-                        "Unable to locate a shopping cart with the given userId:  "
-                        + user.getId() + "Add items to the shopping cart to initialize it."));
+                .orElseGet(() -> {
+                    ShoppingCart newShoppingCart = new ShoppingCart();
+                    newShoppingCart.setUser(user);
+                    return shoppingCartRepository.save(newShoppingCart);
+                });
 
         ShoppingCartDto shoppingCartDto = shoppingCartMapper.toDto(shoppingCart);
         Set<CartItemResponseDto> cartItemsSet = cartItemRepository
@@ -47,6 +50,7 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
                 .map(cartItemMapper::toDto)
                 .collect(Collectors.toCollection(LinkedHashSet::new));
         shoppingCartDto.setCartItems(cartItemsSet);
+
         return shoppingCartDto;
     }
 

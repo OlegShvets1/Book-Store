@@ -82,9 +82,18 @@ public class BookServiceImpl implements BookService {
     }
 
     private Set<Category> setCategoriesById(Set<Long> categoryIds) {
+        if (categoryIds == null) {
+            throw new IllegalArgumentException("categoryIds cannot be null");
+        }
+
         return categoryIds.stream()
-                .map(id -> categoryRepository.findById(id).orElseThrow(
-                        () -> new EntityNotFoundException("Can't find category by id: " + id)))
+                .map(id -> {
+                    if (id == null) {
+                        throw new IllegalArgumentException("Category id cannot be null");
+                    }
+                    return categoryRepository.findById(id).orElseThrow(
+                            () -> new EntityNotFoundException("Can't find category by id: " + id));
+                })
                 .collect(Collectors.toSet());
     }
 }

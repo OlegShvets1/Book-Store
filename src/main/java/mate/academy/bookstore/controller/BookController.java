@@ -30,7 +30,7 @@ public class BookController {
     private final BookService bookService;
 
     @Operation(summary = "Get all books", description = "Get all books")
-    @PreAuthorize("hasRole('USER')")
+    @PreAuthorize("hasAuthority('USER')")
     @GetMapping
     public List<BookDto> getAll(Pageable pageable) {
         return bookService.findAll(pageable);
@@ -45,7 +45,7 @@ public class BookController {
     }
 
     @Operation(summary = "Create a book", description = "Create a new book")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAuthority('ADMIN')")
     @PostMapping
     public BookDto createBook(@RequestBody @Valid CreateBookRequestDto bookDto) {
 
@@ -53,7 +53,7 @@ public class BookController {
     }
 
     @Operation(summary = "Delete a book by id", description = "Delete a book by id")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAuthority('ADMIN')")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @DeleteMapping("/{id}")
     public void delete(@PathVariable Long id) {
@@ -62,7 +62,7 @@ public class BookController {
     }
 
     @Operation(summary = "Update a book by id", description = "Update a book by id")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAuthority('ADMIN')")
     @PutMapping("/{id}")
     public BookDto updateBook(@PathVariable Long id,
                 @RequestBody @Valid CreateBookRequestDto bookRequestDto) {
@@ -70,7 +70,7 @@ public class BookController {
     }
 
     @Operation(summary = "Search books by parameters", description = "Search book by parameters")
-    @PreAuthorize("hasRole('USER')")
+    @PreAuthorize("hasAuthority('USER')")
     @GetMapping("/search")
     public List<BookDto> search(@Valid BookSearchParametersDto searchParameters,
                                 Pageable pageable) {
