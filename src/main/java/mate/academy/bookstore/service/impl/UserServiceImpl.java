@@ -12,6 +12,7 @@ import mate.academy.bookstore.repository.user.UserRepository;
 import mate.academy.bookstore.service.UserService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -22,6 +23,7 @@ public class UserServiceImpl implements UserService {
     private final ShoppingCartRepository shoppingCartRepository;
 
     @Override
+    @Transactional
     public UserResponseDto register(UserRegistrationRequestDto requestDto) {
         if (userRepository.findByEmail(requestDto.getEmail()).isPresent()) {
             throw new RegistrationException("User with email: "

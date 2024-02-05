@@ -37,11 +37,8 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
         User user = (User) authentication.getPrincipal();
 
         ShoppingCart shoppingCart = shoppingCartRepository.findByUserId(user.getId())
-                .orElseGet(() -> {
-                    ShoppingCart newShoppingCart = new ShoppingCart();
-                    newShoppingCart.setUser(user);
-                    return shoppingCartRepository.save(newShoppingCart);
-                });
+                .orElseThrow(() -> new IllegalStateException("Cart cannot be found for User "
+                        + "with email - " + user.getEmail()));
 
         ShoppingCartDto shoppingCartDto = shoppingCartMapper.toDto(shoppingCart);
         Set<CartItemResponseDto> cartItemsSet = cartItemRepository
@@ -59,7 +56,9 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
                                                      CartItemRequestDto requestDto) {
         User user = (User) authentication.getPrincipal();
         ShoppingCart shoppingCart = shoppingCartRepository.findByUserId(user.getId())
-                .orElseGet(() -> createNewShoppingCart(user));
+                .orElseThrow(() -> new IllegalStateException(
+                        "Cart cannot be found for User "
+                                + "with email - " + user.getEmail()));
 
         Book book = bookRepository.findById(requestDto.getBookId())
                 .orElseThrow(() -> new EntityNotFoundException("The book with the current ID: "
@@ -74,13 +73,6 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
         shoppingCart.setCartItems(cartItems);
         shoppingCartRepository.save(shoppingCart);
         return cartItemMapper.toDto(cartItem);
-    }
-
-    @Override
-    public ShoppingCart createNewShoppingCart(User user) {
-        ShoppingCart shoppingCart = new ShoppingCart();
-        shoppingCart.setUser(user);
-        return shoppingCartRepository.save(shoppingCart);
     }
 
     @Override

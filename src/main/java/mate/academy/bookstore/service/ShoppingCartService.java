@@ -4,8 +4,6 @@ import mate.academy.bookstore.dto.shoppingcart.ShoppingCartDto;
 import mate.academy.bookstore.dto.shoppingcart.cartitem.CartItemRequestDto;
 import mate.academy.bookstore.dto.shoppingcart.cartitem.CartItemResponseDto;
 import mate.academy.bookstore.dto.shoppingcart.cartitem.CartItemUpdateDataRequestDto;
-import mate.academy.bookstore.model.ShoppingCart;
-import mate.academy.bookstore.model.User;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 
@@ -21,5 +19,4 @@ public interface ShoppingCartService {
 
     void deleteBookFromTheShoppingCart(Authentication authentication, Long cartItemId);
 
-    ShoppingCart createNewShoppingCart(User user);
 }
