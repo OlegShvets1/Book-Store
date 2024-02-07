@@ -30,7 +30,7 @@ public class BookServiceImpl implements BookService {
     @Override
     public BookDto save(CreateBookRequestDto bookRequestDto) {
         Book bookModel = bookMapper.toModel(bookRequestDto);
-        Set<Category> categories = setCategoriesByIds(bookRequestDto.getCategoryIds());
+        Set<Category> categories = setCategoriesById(bookRequestDto.getCategoryIds());
         bookModel.setCategories(categories);
         return bookMapper.toDto(bookRepository.save(bookModel));
     }
@@ -65,9 +65,9 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
-    public List<BookDto> search(BookSearchParametersDto searchParameters) {
+    public List<BookDto> search(BookSearchParametersDto searchParameters, Pageable pageable) {
         Specification<Book> bookSpecification = bookSpecificationBuilder.build(searchParameters);
-        return bookRepository.findAll(bookSpecification)
+        return bookRepository.findAll(bookSpecification, pageable)
                 .stream()
                 .map(bookMapper::toDto)
                 .toList();
@@ -75,15 +75,25 @@ public class BookServiceImpl implements BookService {
 
     @Override
     public List<BookDto> findAllByCategoryId(Long categoryId, Pageable pageable) {
-        return bookRepository.findBooksByCategoryId(categoryId, pageable).stream()
+        return bookRepository.findBooksByCategoryId(categoryId, pageable)
+                .stream()
                 .map(bookMapper::toDto)
                 .toList();
     }
 
-    private Set<Category> setCategoriesByIds(Set<Long> categoryIds) {
+    private Set<Category> setCategoriesById(Set<Long> categoryIds) {
+        if (categoryIds == null) {
+            throw new IllegalArgumentException("categoryIds cannot be null");
+        }
+
         return categoryIds.stream()
-                .map(id -> categoryRepository.findById(id).orElseThrow(
-                        () -> new EntityNotFoundException("Can't find category by id: " + id)))
+                .map(id -> {
+                    if (id == null) {
+                        throw new IllegalArgumentException("Category id cannot be null");
+                    }
+                    return categoryRepository.findById(id).orElseThrow(
+                            () -> new EntityNotFoundException("Can't find category by id: " + id));
+                })
                 .collect(Collectors.toSet());
     }
 }

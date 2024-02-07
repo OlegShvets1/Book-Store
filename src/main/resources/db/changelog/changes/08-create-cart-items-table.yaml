@@ -1,10 +1,10 @@
 databaseChangeLog:
   - changeSet:
-      id: create-users-table
+      id: create-cart-items-table
       author: Oleh Shvets
       changes:
         - createTable:
-            tableName: users
+            tableName: cart_items
             columns:
               - column:
                   name: id
@@ -12,33 +12,28 @@ databaseChangeLog:
                   autoIncrement: true
                   constraints:
                     primaryKey: true
-                    nullable: false
               - column:
-                  name: email
-                  type: varchar(255)
+                  name: shopping_cart_id
+                  type: bigint
                   constraints:
                     nullable: false
-                    unique: true
+                    references: shopping_carts(id)
+                    foreignKeyName: fk_cart_items_shopping_cart_id
               - column:
-                  name: password
-                  type: varchar(255)
+                  name: book_id
+                  type: bigint
                   constraints:
                     nullable: false
+                    references: books(id)
+                    foreignKeyName: fk_cart_items_book_id
               - column:
-                  name: first_name
-                  type: varchar(100)
+                  name: quantity
+                  type: integer
                   constraints:
                     nullable: false
-              - column:
-                  name: last_name
-                  type: varchar(100)
-                  constraints:
-                    nullable: false
-              - column:
-                  name: shipping_address
-                  type: varchar(255)
               - column:
                   name: is_deleted
                   type: boolean
+                  defaultValueBoolean: false
                   constraints:
                     nullable: false
