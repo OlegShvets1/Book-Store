@@ -11,7 +11,6 @@ import mate.academy.bookstore.dto.order.OrderStatusRequestDto;
 import mate.academy.bookstore.service.OrderService;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -28,15 +27,15 @@ public class OrderController {
 
     @Operation(summary = "Submit order", description = "submit current order")
     @PostMapping
-    public OrderResponseDto submitOrder(Authentication authentication, Pageable pageable,
+    public OrderResponseDto submitOrder(Long userId, Pageable pageable,
                       @RequestBody @Valid OrderPresentationRequestDto requestDto) {
-        return orderService.createOrder(authentication, pageable, requestDto);
+        return orderService.createOrder(userId, pageable, requestDto);
     }
 
     @Operation(summary = "Get orders", description = "get user orders")
     @GetMapping
-    public List<OrderResponseDto> getOrders(Authentication authentication, Pageable pageable) {
-        return orderService.getOrders(authentication, pageable);
+    public List<OrderResponseDto> getOrders(Long userId, Pageable pageable) {
+        return orderService.getOrders(userId, pageable);
     }
 
     @Operation(summary = "Update order status", description = "update order status bu orderId")
@@ -49,15 +48,15 @@ public class OrderController {
 
     @Operation(summary = "Get order items", description = "get order items by orderId")
     @GetMapping("/{orderId}/items")
-    public List<OrderItemResponseDto> getOrderItemsByOrderId(Authentication authentication,
+    public List<OrderItemResponseDto> getOrderItemsByOrderId(Long userId,
                        @PathVariable Long orderId, Pageable pageable) {
-        return orderService.getOrderItemsByOrderId(authentication, orderId, pageable);
+        return orderService.getOrderItemsByOrderId(userId, orderId, pageable);
     }
 
     @Operation(summary = "Get OrderItem", description = "get OrderItems by orderId and ItemId")
     @GetMapping("/{orderId}/items/{orderItemId}")
-    public OrderItemResponseDto getOrderItemByIdAndOrderId(Authentication authentication,
+    public OrderItemResponseDto getOrderItemByIdAndOrderId(Long userId,
                       @PathVariable Long orderId, @PathVariable Long orderItemId) {
-        return orderService.getOrderItemByIdAndOrderId(authentication, orderId, orderItemId);
+        return orderService.getOrderItemByIdAndOrderId(userId, orderId, orderItemId);
     }
 }

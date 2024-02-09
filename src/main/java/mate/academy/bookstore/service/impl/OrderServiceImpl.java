@@ -18,13 +18,11 @@ import mate.academy.bookstore.model.CartItem;
 import mate.academy.bookstore.model.Order;
 import mate.academy.bookstore.model.OrderItem;
 import mate.academy.bookstore.model.ShoppingCart;
-import mate.academy.bookstore.model.User;
 import mate.academy.bookstore.repository.order.OrderItemRepository;
 import mate.academy.bookstore.repository.order.OrderRepository;
 import mate.academy.bookstore.repository.shoppingcart.ShoppingCartRepository;
 import mate.academy.bookstore.service.OrderService;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -39,21 +37,18 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     @Transactional
-    public OrderResponseDto createOrder(Authentication authentication, Pageable pageable,
-                OrderPresentationRequestDto requestDto) {
-        User user = (User) authentication.getPrincipal();
-        ShoppingCart shoppingCart = shoppingCartRepository.findByUserId(user.getId()).orElseThrow(
-                () -> new EntityNotFoundException("Can't find ShoppingCart by userId: "
-                        + user.getId()));
+    public OrderResponseDto createOrder(Long userId, Pageable pageable,
+              OrderPresentationRequestDto requestDto) {
+        ShoppingCart shoppingCart = shoppingCartRepository.findByUserId(userId).orElseThrow(
+                () -> new EntityNotFoundException("Can't find ShoppingCart by userId: " + userId));
 
         Set<CartItem> cartItems = shoppingCart.getCartItems();
         if (cartItems.isEmpty()) {
-            throw new OrderException("ShoppingCart is empty. "
-                    + "Please add items to it before confirming your order.");
+            return new OrderResponseDto();
         }
 
         Order order = placeAnOrder(shoppingCart, requestDto.getShippingAddress());
-        order.setOrderItems(fullFillSetOfOrderItems(order, cartItems));
+        order.setOrderItems(createSetOfOrderItems(order, cartItems));
         OrderResponseDto orderResponseDto = orderMapper.toDto(order);
 
         cleanShoppingCart(shoppingCart);
@@ -61,15 +56,14 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    @Transactional
-    public List<OrderResponseDto> getOrders(Authentication authentication, Pageable pageable) {
-        User user = (User) authentication.getPrincipal();
-        return orderRepository.findOrdersByUserId(user.getId(), pageable).stream()
+    public List<OrderResponseDto> getOrders(Long userId, Pageable pageable) {
+        return orderRepository.findOrdersByUserId(userId, pageable).stream()
                 .map(orderMapper::toDto)
                 .toList();
     }
 
     @Override
+    @Transactional
     public OrderResponseDto updateOrderStatus(Long orderId, OrderStatusRequestDto requestDto) {
         Order order = orderRepository.findOrderById(orderId).orElseThrow(
                 () -> new EntityNotFoundException("Can't find order by id: " + orderId));
@@ -79,9 +73,9 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public List<OrderItemResponseDto> getOrderItemsByOrderId(Authentication authentication,
-                                                             Long orderId, Pageable pageable) {
-        Order order = getValidOrder(authentication, orderId);
+    public List<OrderItemResponseDto> getOrderItemsByOrderId(Long userId, Long orderId,
+             Pageable pageable) {
+        Order order = getOrderForUser(userId, orderId);
         List<OrderItem> orderItems = orderItemRepository.findOrderItemsByOrderId(orderId, pageable);
         return orderItems.stream()
                 .map(orderItemMapper::toDto)
@@ -89,9 +83,9 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public OrderItemResponseDto getOrderItemByIdAndOrderId(Authentication authentication,
-                                                           Long orderId, Long orderItemId) {
-        Order order = getValidOrder(authentication, orderId);
+    public OrderItemResponseDto getOrderItemByIdAndOrderId(Long userId,
+             Long orderId, Long orderItemId) {
+        Order order = getOrderForUser(userId, orderId);
         OrderItem orderItem = orderItemRepository.findById(orderItemId).orElseThrow(
                 () -> new EntityNotFoundException("Can't find OrderItem by id: " + orderId));
         if (!orderItem.getOrder().getId().equals(order.getId())) {
@@ -107,25 +101,24 @@ public class OrderServiceImpl implements OrderService {
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
-    private Set<OrderItem> fullFillSetOfOrderItems(Order order, Set<CartItem> cartItems) {
+    private Set<OrderItem> createSetOfOrderItems(Order order, Set<CartItem> cartItems) {
         Set<OrderItem> orderItems = cartItems.stream()
-                .map(c -> fullFillOrderItem(order, c))
+                .map(c -> createOrderItem(order, c))
                 .collect(Collectors.toSet());
         orderItemRepository.saveAll(orderItems);
         return orderItems;
     }
 
-    private OrderItem fullFillOrderItem(Order order, CartItem cartItem) {
+    private OrderItem createOrderItem(Order order, CartItem cartItem) {
         OrderItem orderItem = orderItemMapper.toModelFromCartItem(cartItem);
         orderItem.setOrder(order);
         return orderItem;
     }
 
-    private Order getValidOrder(Authentication authentication, Long orderId) {
-        User user = (User) authentication.getPrincipal();
+    private Order getOrderForUser(Long userId, Long orderId) {
         Order order = orderRepository.findOrderById(orderId).orElseThrow(
                 () -> new EntityNotFoundException("Can't find order by id: " + orderId));
-        if (!order.getUser().getId().equals(user.getId())) {
+        if (!order.getUser().getId().equals(userId)) {
             throw new OrderException("You don't have access to Order with id: " + orderId);
         }
         return order;
