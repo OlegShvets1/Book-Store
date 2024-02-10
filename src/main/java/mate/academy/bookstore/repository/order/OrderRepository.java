@@ -5,9 +5,11 @@ import java.util.Optional;
 import mate.academy.bookstore.model.Order;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.repository.query.Param;
 
 public interface OrderRepository extends JpaRepository<Order, Long> {
-    Optional<Order> findOrderById(Long orderId);
+    Optional<Order> findByIdAndUserId(@Param("userId") Long userId,
+                                      @Param("orderId") Long orderId);
 
-    List<Order> findOrdersByUserId(Long userId, Pageable pageable);
+    List<Order> findOrdersByUserId(@Param("userId")Long userId, Pageable pageable);
 }

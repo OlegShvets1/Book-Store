@@ -18,9 +18,11 @@ import mate.academy.bookstore.model.CartItem;
 import mate.academy.bookstore.model.Order;
 import mate.academy.bookstore.model.OrderItem;
 import mate.academy.bookstore.model.ShoppingCart;
+import mate.academy.bookstore.model.User;
 import mate.academy.bookstore.repository.order.OrderItemRepository;
 import mate.academy.bookstore.repository.order.OrderRepository;
 import mate.academy.bookstore.repository.shoppingcart.ShoppingCartRepository;
+import mate.academy.bookstore.repository.user.UserRepository;
 import mate.academy.bookstore.service.OrderService;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -32,6 +34,7 @@ public class OrderServiceImpl implements OrderService {
     private final ShoppingCartRepository shoppingCartRepository;
     private final OrderItemRepository orderItemRepository;
     private final OrderRepository orderRepository;
+    private final UserRepository userRepository;
     private final OrderMapper orderMapper;
     private final OrderItemMapper orderItemMapper;
 
@@ -39,6 +42,8 @@ public class OrderServiceImpl implements OrderService {
     @Transactional
     public OrderResponseDto createOrder(Long userId, Pageable pageable,
               OrderPresentationRequestDto requestDto) {
+        User user = getUser(userId);
+
         ShoppingCart shoppingCart = shoppingCartRepository.findByUserId(userId).orElseThrow(
                 () -> new EntityNotFoundException("Can't find ShoppingCart by userId: " + userId));
 
@@ -64,9 +69,11 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     @Transactional
-    public OrderResponseDto updateOrderStatus(Long orderId, OrderStatusRequestDto requestDto) {
-        Order order = orderRepository.findOrderById(orderId).orElseThrow(
-                () -> new EntityNotFoundException("Can't find order by id: " + orderId));
+    public OrderResponseDto updateOrderStatus(Long userId, Long orderId,
+                OrderStatusRequestDto requestDto) {
+        Order order = orderRepository.findByIdAndUserId(userId, orderId)
+                .orElseThrow(
+                    () -> new EntityNotFoundException("Can't find order by id: " + orderId));
         order.setStatus(requestDto.getStatus());
         Order savedOrder = orderRepository.save(order);
         return orderMapper.toDto(savedOrder);
@@ -116,7 +123,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     private Order getOrderForUser(Long userId, Long orderId) {
-        Order order = orderRepository.findOrderById(orderId).orElseThrow(
+        Order order = orderRepository.findByIdAndUserId(userId, orderId).orElseThrow(
                 () -> new EntityNotFoundException("Can't find order by id: " + orderId));
         if (!order.getUser().getId().equals(userId)) {
             throw new OrderException("You don't have access to Order with id: " + orderId);
@@ -137,5 +144,12 @@ public class OrderServiceImpl implements OrderService {
         order.setShippingAddress(shippingAddress);
         order.setTotal(countTotalOrderPrice(shoppingCart.getCartItems()));
         return orderRepository.save(order);
+    }
+
+    private User getUser(Long userId) {
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException(
+                        "Can`t find user by id" + userId
+                ));
     }
 }
