@@ -2,7 +2,7 @@ version: "3.8"
 
 services:
   mysql:
-    image: mysql:8.0
+    image: mysql:8.0.33
     restart: unless-stopped
     env_file: ./.env
     environment:
@@ -12,11 +12,6 @@ services:
       - MYSQLDB_PASSWORD=$MYSQLDB_PASSWORD
     ports:
       - $MYSQLDB_LOCAL_PORT:$MYSQLDB_DOCKER_PORT
-    healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "mysql"]
-      timeout: 10s
-      retries: 5
-      interval: 10s
 
   book-lib-app:
     depends_on:
