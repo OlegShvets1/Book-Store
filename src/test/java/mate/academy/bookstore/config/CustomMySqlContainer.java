@@ -2,12 +2,16 @@ package mate.academy.bookstore.config;
 
 import org.testcontainers.containers.MySQLContainer;
 
+import java.time.Duration;
+
 public class CustomMySqlContainer extends MySQLContainer<CustomMySqlContainer> {
     private static final String DB_IMAGE = "mysql:8.0.33";
     private static CustomMySqlContainer mysqlContainer;
 
     public CustomMySqlContainer() {
+
         super(DB_IMAGE);
+        this.withStartupTimeout(Duration.ofMinutes(5));
     }
 
     public static synchronized CustomMySqlContainer getInstance() {

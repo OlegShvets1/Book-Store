@@ -12,7 +12,7 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.test.context.jdbc.Sql;
 
-@Sql(scripts = "classpath:database/books/add-books-and-category-to-db.sql",
+@Sql(scripts = "classpath:database/books/add-book-and-category-to-db.sql",
         executionPhase = Sql.ExecutionPhase.BEFORE_TEST_CLASS)
 @Sql(scripts = "classpath:database/books/remove-books-and-category-from-db.sql",
         executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
