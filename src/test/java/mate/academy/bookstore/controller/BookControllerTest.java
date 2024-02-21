@@ -3,8 +3,7 @@ package mate.academy.bookstore.controller;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import mate.academy.bookstore.dto.book.BookDto;
@@ -28,15 +27,11 @@ import org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfig
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
-    @Sql(scripts = {"classpath:database/books/remove-books-and-category-from-db.sql",
-        "classpath:database/books/remove-categories-from-db.sql",
-        "classpath:database/books/add-book-and-category-to-db.sql"},
-        executionPhase = Sql.ExecutionPhase.BEFORE_TEST_CLASS)
-    @Sql(scripts = "classpath:database/books/remove-books-and-category-from-db.sql",
-        executionPhase = Sql.ExecutionPhase.AFTER_TEST_CLASS)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class BookControllerTest {
     private static final Long DEFAULT_ID = 1L;
@@ -53,33 +48,104 @@ public class BookControllerTest {
                 .apply(springSecurity())
                 .build();
     }
+
     @Test
-    @Sql(scripts = "classpath:database/books/delete-added-book-from-db.sql",
-              executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
-    @WithMockUser(username = "admin", roles = {"ADMIN"})
-    @DisplayName("Create a new book")
-    void  createBook_ValidRequestDto_Ok() throws Exception {
-        CreateBookRequestDto requestDto = new CreateBookRequestDto();
-        requestDto.setAuthor("Daniel Defoe");
-        requestDto.setTitle("Robinson Crusoe");
-        requestDto.setPrice(DEFAULT_PRICE);
-        requestDto.setCategoryIds(Set.of(1L));
-        requestDto.setIsbn("121-000-001");
+    @WithMockUser(username = "user", authorities = {"USER"})
+    void getAllBooks_Ok() throws Exception {
+        List<BookDto> expected = List.of(getBookDto());
+
+        MvcResult result = mockMvc.perform(get("/api/books"))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        BookDto[] actual = objectMapper
+                .readValue(result.getResponse().getContentAsString(), BookDto[].class);
+        Assertions.assertNotNull(actual);
+
+        EqualsBuilder.reflectionEquals(expected, actual,
+                "id", "description", "coverImage");
+    }
+
+        @Test
+        @WithMockUser(username = "user", authorities = {"USER"})
+        @Sql(scripts = "classpath:database/books/add-book-and-category-to-db.sql",
+                executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+        @Sql(scripts = "classpath:database/books/remove-books-and-category-from-db.sql",
+                executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
+        void getBookById_ValidId_Ok() throws Exception {
+            MvcResult result = mockMvc.perform(get("/api/books/1"))
+                    .andExpect(status().isOk())
+                    .andReturn();
+
+            BookDto actual = objectMapper
+                    .readValue(result.getResponse().getContentAsString(), BookDto.class);
+
+            Assertions.assertNotNull(actual);
+            Assertions.assertEquals("Shantaram", actual.getTitle());
+        }
+
+//    @Test
+//    @WithMockUser(username = "admin", authorities = {"ADMIN"})
+//    @Sql(scripts = "classpath:database/books/add-book-and-category-to-db.sql",
+//            executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+//    @Sql(scripts = "classpath:database/books/remove-books-and-category-from-db.sql",
+//            executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
+//    void createBook_ValidBook_ok() throws Exception {
+//        CreateBookRequestDto bookRequestDto = new CreateBookRequestDto();
+//        bookRequestDto.setAuthor("Daniel Defoe");
+//        bookRequestDto.setTitle("Robinson Crusoe");
+//        bookRequestDto.setPrice(DEFAULT_PRICE);
+//        bookRequestDto.setCategoryIds(Set.of(1L));
+//        bookRequestDto.setIsbn("121-000-001");
+//
+//        BookDto expected = getBookDto();
+//
+//        String jsonRequest = objectMapper.writeValueAsString(bookRequestDto);
+//
+//        MvcResult result = mockMvc.perform(post("/api/books")
+//                        .content(jsonRequest)
+//                        .contentType(MediaType.APPLICATION_JSON))
+//                .andExpect(status().isCreated())
+//                .andReturn();
+//
+//        BookDto actual =
+//                objectMapper.readValue(result.getResponse().getContentAsString(), BookDto.class);
+//        Assertions.assertNotNull(actual);
+//
+//        EqualsBuilder
+//                .reflectionEquals(expected, actual, "id", "description", "coverImage");
+//    }
+
+//
+
+
+    @Test
+    @WithMockUser(username = "admin", authorities = {"ADMIN"})
+    @Sql(scripts = "classpath:database/books/add-book-and-category-to-db.sql",
+            executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+    @Sql(scripts = "classpath:database/books/remove-books-and-category-from-db.sql",
+            executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
+    void updateBook_WithValidRequest_ok() throws Exception {
+        CreateBookRequestDto bookRequestDto = new CreateBookRequestDto();
+        bookRequestDto.setAuthor("Daniel Defoe");
+        bookRequestDto.setTitle("Robinson Crusoe");
+        bookRequestDto.setPrice(BigDecimal.valueOf(75));
+        bookRequestDto.setCategoryIds(Set.of(1L));
+        bookRequestDto.setIsbn("121-000-001");
 
         BookDto expected = new BookDto();
-        expected.setAuthor(requestDto.getAuthor());
-        expected.setTitle(requestDto.getTitle());
-        expected.setPrice(requestDto.getPrice());
-        expected.setCategoryIds(requestDto.getCategoryIds());
-        expected.setIsbn(requestDto.getIsbn());
-        expected.setId(2L);
+        expected.setAuthor(bookRequestDto.getAuthor());
+        expected.setTitle(bookRequestDto.getTitle());
+        expected.setPrice(bookRequestDto.getPrice());
+        expected.setCategoryIds(bookRequestDto.getCategoryIds());
+        expected.setIsbn(bookRequestDto.getIsbn());
+        expected.setId(1L);
 
-        String jsonRequest = objectMapper.writeValueAsString(requestDto);
-
-        MvcResult mvcResult = mockMvc.perform(post("/api/books")
+        String jsonRequest = objectMapper.writeValueAsString(bookRequestDto);
+        MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.put("/api/books/1")
                         .content(jsonRequest)
                         .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isCreated())
+                .andExpect(MockMvcResultMatchers.status().isOk())
                 .andReturn();
 
         BookDto actual = objectMapper
@@ -89,33 +155,12 @@ public class BookControllerTest {
         assertNotNull(actual.getId());
         assertEquals(expected, actual);
     }
-
-//    @Test
-//    @WithMockUser(username = "user", roles = {"USER"})
-//    @DisplayName("")
-//    void getAll_Ok() throws Exception {
-//        List<BookDto> expected = List.of(getBookDto());
-//
-//        MvcResult result = mockMvc.perform(get("/api/books"))
-//                .andExpect(status().isOk())
-//                .andReturn();
-//
-//        BookDto[] actual = objectMapper
-//                .readValue(result.getResponse().getContentAsString(), BookDto[].class);
-//        Assertions.assertNotNull(actual);
-//
-//        EqualsBuilder.reflectionEquals(
-//                expected,
-//                actual,
-//                "id", "description", "coverImage");
-//    }
-//
-//    private static BookDto getBookDto() {
-//        return new BookDto()
-//                .setId(1L)
-//                .setTitle("Title")
-//                .setAuthor("Author")
-//                .setIsbn("1234")
-//                .setPrice(BigDecimal.valueOf(20.00));
-//    }
+    private static BookDto getBookDto() {
+        return new BookDto()
+                .setId(DEFAULT_ID)
+                .setTitle("Robinson Crusoe")
+                .setAuthor("Daniel Defoe")
+                .setIsbn("121-000-001")
+                .setPrice(DEFAULT_PRICE);
+    }
 }
