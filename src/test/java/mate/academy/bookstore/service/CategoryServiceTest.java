@@ -6,20 +6,18 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
+import java.util.Optional;
 import mate.academy.bookstore.dto.category.CategoryDto;
 import mate.academy.bookstore.exception.EntityNotFoundException;
 import mate.academy.bookstore.mapper.CategoryMapper;
 import mate.academy.bookstore.model.Category;
 import mate.academy.bookstore.repository.category.CategoryRepository;
 import mate.academy.bookstore.service.impl.CategoryServiceImpl;
-import java.util.Optional;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
@@ -32,7 +30,6 @@ public class CategoryServiceTest {
     private CategoryRepository categoryRepository;
     @InjectMocks
     private CategoryServiceImpl categoryService;
-
 
     @BeforeEach
     public void setup() {
@@ -55,11 +52,11 @@ public class CategoryServiceTest {
 
     @Test
     void updateCategory_validId_ok() {
-        CategoryDto expected = new CategoryDto("Adventure", "adventure book");
-
         Category category = new Category();
         category.setName("Adventure");
         category.setDescription("Adventure");
+
+        CategoryDto expected = new CategoryDto("Adventure", "adventure book");
         when(categoryRepository.findById(DEFAULT_ID)).thenReturn(Optional.of(category));
         when(categoryMapper.toModel(any())).thenReturn(category);
         when(categoryRepository.save(any())).thenReturn(new Category());
@@ -70,15 +67,14 @@ public class CategoryServiceTest {
         assertEquals(expected, actual);
     }
 
-@Test
-void updateCategory_invalidId_notOk() {
-    Long invalidCategoryId = 111L;
-    CategoryDto categoryDto = new CategoryDto("Adventure", "adventure book");
-    when(categoryRepository.findById(invalidCategoryId)).thenReturn(Optional.empty());
-
-    assertThrows(EntityNotFoundException.class,
-            () -> categoryService.update(invalidCategoryId, categoryDto));
-}
+    @Test
+    void updateCategory_invalidId_notOk() {
+        Long invalidCategoryId = 111L;
+        CategoryDto categoryDto = new CategoryDto("Adventure", "adventure book");
+        when(categoryRepository.findById(invalidCategoryId)).thenReturn(Optional.empty());
+        assertThrows(EntityNotFoundException.class,
+                () -> categoryService.update(invalidCategoryId, categoryDto));
+    }
 
     @Test
     void getCategoryById_validId_ok() {

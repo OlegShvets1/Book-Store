@@ -1,8 +1,7 @@
 package mate.academy.bookstore.config;
 
-import org.testcontainers.containers.MySQLContainer;
-
 import java.time.Duration;
+import org.testcontainers.containers.MySQLContainer;
 
 public class CustomMySqlContainer extends MySQLContainer<CustomMySqlContainer> {
     private static final String DB_IMAGE = "mysql:8.0.33";
