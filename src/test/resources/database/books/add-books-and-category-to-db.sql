@@ -1,4 +1,4 @@
-INSERT INTO categories (id, name, description, is_deleted) VALUES (1, 'History', 'Book about histiry', false);
+INSERT INTO categories (id, name, description, is_deleted) VALUES (1, 'History', 'Book about history', false);
 
 INSERT INTO books (id, title, author, isbn, price, description, cover_image, is_deleted)
 VALUES (1, 'Shantaram', 'Gregory David Roberts', '000000000001', 139.0,
