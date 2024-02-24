@@ -96,7 +96,7 @@ public class CategoryControllerTest {
 
         String jsonRequest = objectMapper.writeValueAsString(expected);
 
-        MvcResult mvcResult = mockMvc.perform(put("/api/categories/1")
+        MvcResult mvcResult = mockMvc.perform(put("/api/categories/2")
                         .content(jsonRequest)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isOk())
@@ -174,7 +174,7 @@ public class CategoryControllerTest {
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andReturn();
 
-        CategoryDto expected = createFourExistingCategories().get(2);
+        CategoryDto expected = createFourExistingCategories().get(1);
         CategoryDto actual = objectMapper
                 .readValue(mvcResult.getResponse().getContentAsString(), CategoryDto.class);
 
