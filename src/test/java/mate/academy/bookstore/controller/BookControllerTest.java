@@ -163,6 +163,25 @@ public class BookControllerTest {
                 .andReturn();
     }
 
+    @Test
+    public void findAllBooks_WithNotAuthorisedUser_notOk() throws Exception {
+        mockMvc.perform(
+                        get("/api/books")
+                                .contentType(MediaType.APPLICATION_JSON)
+                )
+                .andExpect(status().is4xxClientError())
+                .andReturn();
+    }
+
+    @Test
+    @WithMockUser(username = "user", authorities = {"USER"})
+    public void getAllBooksEndpoint_ok() throws Exception {
+        mockMvc.perform(get("/api/books")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andReturn();
+    }
+
     private static BookDto getBookDto() {
         return new BookDto()
                 .setId(DEFAULT_ID)

@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.ArrayList;
@@ -180,6 +181,26 @@ public class CategoryControllerTest {
 
         assertNotNull(actual);
         assertEquals(expected, actual);
+    }
+
+    @Test
+    @WithMockUser(username = "user", authorities = {"USER"})
+    public void getAllCategoriesEndpoint_ok() throws Exception {
+        mockMvc.perform(get("/api/categories")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andReturn();
+    }
+
+    @Test
+    public void getAllCategories_WithNotAuthorisedUser_notOk()
+            throws Exception {
+        mockMvc.perform(
+                        get("/api/categories")
+                                .contentType(MediaType.APPLICATION_JSON)
+                )
+                .andExpect(status().is4xxClientError())
+                .andReturn();
     }
 
     private List<CategoryDto> createFourExistingCategories() {
