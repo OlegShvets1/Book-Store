@@ -1,11 +1,13 @@
 package mate.academy.bookstore.controller;
 
+import static org.hamcrest.Matchers.hasSize;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -179,6 +181,40 @@ public class BookControllerTest {
         mockMvc.perform(get("/api/books")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
+                .andReturn();
+    }
+
+    @Test
+    @WithMockUser(username = "user", authorities = {"USER"})
+    @Sql(scripts = "classpath:database/books/add-books-and-category-to-db.sql",
+            executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+    @Sql(scripts = "classpath:database/books/remove-books-and-category-from-db.sql",
+            executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
+    public void getBooksPriceGreaterThan120_ok() throws Exception {
+        mockMvc.perform(get("/api/books")
+                        .param("price", "120")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[?(@.price > 120)]").exists())
+                .andReturn();
+    }
+
+    @Test
+    @WithMockUser(username = "user", authorities = {"USER"})
+    @Sql(scripts = "classpath:database/books/add-books-and-category-to-db.sql",
+            executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+    @Sql(scripts = "classpath:database/books/remove-books-and-category-from-db.sql",
+            executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
+    public void getBooksByAuthorAndTitle_ok() throws Exception {
+        mockMvc.perform(get("/api/books")
+                        .param("author", "Stephen King")
+                        .param("title", "The Shining")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[?(@.author == 'Jack London' "
+                        + "&& @.title == 'White Fang')]").exists())
+                .andExpect(jsonPath("$[?(@.author == 'Jack London' "
+                        + "&& @.title == 'White Fang')]", hasSize(1)))
                 .andReturn();
     }
 
