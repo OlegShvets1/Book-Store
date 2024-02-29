@@ -5,7 +5,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest(classes = BookStoreApplicationTests.class)
 class BookStoreApplicationTests {
-
     @Test
     void contextLoads() {
     }
