@@ -17,10 +17,10 @@ import org.springframework.test.context.jdbc.Sql;
         executionPhase = Sql.ExecutionPhase.BEFORE_TEST_CLASS)
 @Sql(scripts = "classpath:database/books/add-books-to-shoppingCart-to-db.sql",
         executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
-@Sql(scripts = "classpath:database/books/delete-user-from-db.sql",
-        executionPhase = Sql.ExecutionPhase.AFTER_TEST_CLASS)
 @Sql(scripts = "classpath:database/books/delete-books-and-shoppingCart-from-db.sql",
         executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
+@Sql(scripts = "classpath:database/books/delete-user-from-db.sql",
+        executionPhase = Sql.ExecutionPhase.AFTER_TEST_CLASS)
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 public class ShoppingCartRepositoryTest {

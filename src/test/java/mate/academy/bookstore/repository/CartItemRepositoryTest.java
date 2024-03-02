@@ -14,12 +14,10 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.jdbc.Sql;
 
-@Sql(scripts = {"classpath:database/books/delete-books-and-shoppingCart-from-db.sql",
-        "classpath:database/books/add-user-to-db.sql"},
+@Sql(scripts = "classpath:database/books/add-user-to-db.sql",
         executionPhase = Sql.ExecutionPhase.BEFORE_TEST_CLASS)
 @Sql(scripts = "classpath:database/books/delete-user-from-db.sql",
         executionPhase = Sql.ExecutionPhase.AFTER_TEST_CLASS)
-
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @DataJpaTest
 public class CartItemRepositoryTest {

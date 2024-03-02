@@ -31,6 +31,8 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
+@Sql(scripts = "classpath:database/books/delete-books-and-shoppingCart-from-db.sql",
+        executionPhase = Sql.ExecutionPhase.BEFORE_TEST_CLASS)
 @Sql(scripts = "classpath:database/books/add-user-to-db.sql",
         executionPhase = Sql.ExecutionPhase.BEFORE_TEST_CLASS)
 @Sql(scripts = "classpath:database/books/delete-user-from-db.sql",
@@ -52,6 +54,8 @@ public class ShoppingCartControllerTest {
                 .build();
     }
 
+    @Sql(scripts = "classpath:database/books/delete-books-and-shoppingCart-from-db.sql",
+            executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     @Sql(scripts = "classpath:database/books/add-books-to-shoppingCart-to-db.sql",
             executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     @Sql(scripts = "classpath:database/books/delete-books-and-shoppingCart-from-db.sql",
