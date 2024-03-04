@@ -191,5 +191,6 @@ public class ShoppingCartServiceTest {
 
         verify(shoppingCartRepository).findByUserId(userId);
         verify(cartItemRepository).findById(cartItemId);
+        verify(cartItemRepository).delete(cartItem2);
     }
 }

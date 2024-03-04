@@ -16,6 +16,10 @@ import org.springframework.test.context.jdbc.Sql;
 
 @Sql(scripts = "classpath:database/books/add-user-to-db.sql",
         executionPhase = Sql.ExecutionPhase.BEFORE_TEST_CLASS)
+@Sql(scripts = "classpath:database/books/add-books-to-shoppingCart-to-db.sql",
+        executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+@Sql(scripts = "classpath:database/books/delete-books-and-shoppingCart-from-db.sql",
+        executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
 @Sql(scripts = "classpath:database/books/delete-user-from-db.sql",
         executionPhase = Sql.ExecutionPhase.AFTER_TEST_CLASS)
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
@@ -27,30 +31,18 @@ public class CartItemRepositoryTest {
     @Autowired
     private CartItemRepository cartItemRepository;
 
-    @Sql(scripts = "classpath:database/books/add-books-to-shoppingCart-to-db.sql",
-            executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
-    @Sql(scripts = "classpath:database/books/delete-books-and-shoppingCart-from-db.sql",
-            executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
     @Test
     void findByShoppingCartId_validId_ok() {
         Set<CartItem> cartItems = cartItemRepository.findByShoppingCartId(VALID_USER_ID);
         assertEquals(CART_ITEMS_AMOUNT, cartItems.size());
     }
 
-    @Sql(scripts = "classpath:database/books/add-books-to-shoppingCart-to-db.sql",
-            executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
-    @Sql(scripts = "classpath:database/books/delete-books-and-shoppingCart-from-db.sql",
-            executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
     @Test
     void findByShoppingCartId_invalidId_notOk() {
         Set<CartItem> cartItems = cartItemRepository.findByShoppingCartId(INVALID_USER_ID);
         assertEquals(0, cartItems.size());
     }
 
-    @Sql(scripts = "classpath:database/books/add-books-to-shoppingCart-to-db.sql",
-            executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
-    @Sql(scripts = "classpath:database/books/delete-books-and-shoppingCart-from-db.sql",
-            executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
     @Test
     void findByShoppingCartId_validIdAndPage_ok() {
         Pageable pageable = PageRequest.of(0, CART_ITEMS_AMOUNT - 1);

@@ -35,6 +35,10 @@ import org.springframework.web.context.WebApplicationContext;
         executionPhase = Sql.ExecutionPhase.BEFORE_TEST_CLASS)
 @Sql(scripts = "classpath:database/books/add-user-to-db.sql",
         executionPhase = Sql.ExecutionPhase.BEFORE_TEST_CLASS)
+@Sql(scripts = "classpath:database/books/add-books-to-shoppingCart-to-db.sql",
+        executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+@Sql(scripts = "classpath:database/books/delete-books-and-shoppingCart-from-db.sql",
+        executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
 @Sql(scripts = "classpath:database/books/delete-user-from-db.sql",
         executionPhase = Sql.ExecutionPhase.AFTER_TEST_CLASS)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -54,12 +58,6 @@ public class ShoppingCartControllerTest {
                 .build();
     }
 
-    @Sql(scripts = "classpath:database/books/delete-books-and-shoppingCart-from-db.sql",
-            executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
-    @Sql(scripts = "classpath:database/books/add-books-to-shoppingCart-to-db.sql",
-            executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
-    @Sql(scripts = "classpath:database/books/delete-books-and-shoppingCart-from-db.sql",
-            executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
     @Test
     void getShoppingCart_validUser_ok() throws Exception {
         Authentication authentication = userAuthentication(VALID_USER_ID);
@@ -72,10 +70,6 @@ public class ShoppingCartControllerTest {
                 .andExpect(jsonPath("$.cartItems.length()").value(AMOUNT_OF_BOOKS));
     }
 
-    @Sql(scripts = "classpath:database/books/add-books-to-shoppingCart-to-db.sql",
-            executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
-    @Sql(scripts = "classpath:database/books/delete-books-and-shoppingCart-from-db.sql",
-            executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
     @Test
     void addBookToShoppingCart_validBook_ok() throws Exception {
         Authentication authentication = userAuthentication(VALID_USER_ID);
@@ -95,10 +89,6 @@ public class ShoppingCartControllerTest {
                 .andExpect(jsonPath("$.quantity").value(expected.getQuantity()));
     }
 
-    @Sql(scripts = "classpath:database/books/add-books-to-shoppingCart-to-db.sql",
-            executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
-    @Sql(scripts = "classpath:database/books/delete-books-and-shoppingCart-from-db.sql",
-            executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
     @Test
     void updateBookQuantityInShoppingCart_validRequest_ok() throws Exception {
         Authentication authentication = userAuthentication(VALID_USER_ID);
@@ -116,10 +106,6 @@ public class ShoppingCartControllerTest {
                 .andExpect(jsonPath("$.quantity").value(expected.getQuantity()));
     }
 
-    @Sql(scripts = "classpath:database/books/add-books-to-shoppingCart-to-db.sql",
-            executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
-    @Sql(scripts = "classpath:database/books/delete-books-and-shoppingCart-from-db.sql",
-            executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
     @Test
     void updateBookQuantityInShoppingCart_invalidRequest_notOk() throws Exception {
         Authentication authentication = userAuthentication(VALID_USER_ID);
@@ -135,10 +121,6 @@ public class ShoppingCartControllerTest {
                 .andExpect(status().is4xxClientError());
     }
 
-    @Sql(scripts = "classpath:database/books/add-books-to-shoppingCart-to-db.sql",
-            executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
-    @Sql(scripts = "classpath:database/books/delete-books-and-shoppingCart-from-db.sql",
-            executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
     @Test
     void deleteBookFromShoppingCart_validCartItemId_ok() throws Exception {
         Authentication authentication = userAuthentication(VALID_USER_ID);
