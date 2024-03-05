@@ -67,11 +67,7 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
         CartItem cartItem = cartItemMapper.toModel(requestDto);
         cartItem.setShoppingCart(shoppingCart);
         cartItem.setBook(book);
-        CartItem savedCartItem = cartItemRepository.save(cartItem);
-        Set<CartItem> cartItems = cartItemRepository.findByShoppingCartId(shoppingCart.getId());
-        cartItems.add(savedCartItem);
-        shoppingCart.setCartItems(cartItems);
-        shoppingCartRepository.save(shoppingCart);
+        cartItemRepository.save(cartItem);
         return cartItemMapper.toDto(cartItem);
     }
 
