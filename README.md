@@ -21,7 +21,7 @@
 + Docker
 + Docker Testcontainers using MySQL
 
-## Project endpoints:
+## 🏔️🏔️🏔️ Project endpoints:
 
 **To see detailed list of app's endpoints, examples of their usage and response click here**
 
