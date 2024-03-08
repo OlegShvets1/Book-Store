@@ -77,7 +77,7 @@ Exemplary link:
 }
 ```
 
-## Book
+## 📗📘📙 Book
 
 ### Get
 `/api/books` - *returns a list of all stored books accessible for roles User, Admin.*
@@ -207,6 +207,138 @@ Exemplary link:
 
 **Exemple link:**
 `http://localhost:8080/api/books/1`
+
+**Response status code**: 200
+
+## 📜 Category 
+
+### Post
+`/api/categories` - *creates a new category, accessible for role Admin.*
+
+**Exemple link:**
+`http://localhost:8080/api/categories`
+
+**Exemple request:**
+```json
+{
+    "name": "Advantures",
+    "description": "book about advantures"
+}
+```
+Name must not be blank, description may be null or empty.
+
+**Response status code**: 201
+
+Exemplary response:
+```json
+{
+    "id": "1",
+    "name": "Advantures",
+    "description": "book about advantures"
+}
+```
+
+### Get
+`/api/categories` - *returns a list of all categories from database.*
+
+**Exemple link:**
+`http://localhost:8080/api/categories`
+
+**Response status code**: 200
+
+**Exemple response:**
+```json
+[
+    {
+        "id": 1,
+        "name": "Advantures",
+        "description": "book about advantures"
+    },
+    {
+        "id": 2,
+        "name": "History",
+        "description": "Book described some period of history"
+    }
+]
+```
+---
+
+`/api/categories/{id}` - *returns category that has specified id value.*
+
+**Exemple link:**
+`http://localhost:8080/api/categories/1`
+
+**Response status code**: 200
+
+Exemple response:
+```json
+{
+    "id": 1,
+    "name": "Advantures",
+    "description": "book about advantures"
+}
+```
+---
+
+`/api/categories/{id}/books` - *returns a list of books, that have some category*
+
+**Exemple link:**
+`http://localhost:8080/api/categories/1/books`
+
+**Response status code**: 200
+
+**Exemple response:**
+```json
+[
+    {
+    "id": 1,
+    "title": "White Fang",
+    "author": "Jack London",
+    "isbn": "00000000000001",
+    "price": 19.90,
+    "description": "Book about adventure",
+    "coverImage": "http://example.com/whiteFang.jpg",
+    },
+    {
+    "id": 3,
+    "title": "Shantaram",
+    "author": "Greg David Roberts",
+    "isbn": "00000000000003",
+    "price": 27.90,
+    "description": "Book about adventure",
+    "coverImage": "https://example.com/shantaram-cover-image.jpg"
+    }
+]
+```
+### Put
+`http://localhost:8080/api/categories/{id}` - *updates category with specified id, accessible for role Admin.*
+
+**Exemple link:**
+`http://localhost:8080/api/categories/2`
+
+**Exemplary request:**
+```json
+{
+    "name": "updated category",
+    "description": "updated description"
+}
+```
+**Response status code**: 202
+
+**Exempe response:**
+```json
+{
+    "id": "2",
+    "name": "updated category",
+    "description": "updated description"
+}
+```
+
+### Delete
+`http://localhost:8080/api/categories/{id}` - *soft-deletes category with specified id, accessible for role Admin.*
+
+**Exemple link:**
+`http://localhost:8080/api/categories/2`
 
 **Response status code**: 200
 
