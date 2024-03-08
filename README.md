@@ -21,9 +21,197 @@
 + Docker
 + Docker Testcontainers using MySQL
 
-## 🏔️🏔️🏔️ Project endpoints:
+## 🏔️ Project endpoints:
 
-**To see detailed list of app's endpoints, examples of their usage and response click here**
+ ## 🔑Authentication
+
+### Post
+`/api/auth/registration` - *registers new user, accessible without any role.*
+
+Exemplary link:
+`http://localhost:8080/api/auth/registration`
+
+**Exemple request:**
+```json
+{
+    "email": "bob@example.com",
+    "password": "12345678",
+    "repeatPassword": "12345678",
+    "firstName": "Bob",
+    "lastName": "Alison",
+    "shippingAddress": "Bob`s address"
+}
+```
+**Response status code**: 201
+
+**Exemple response:**
+```json
+{
+    "id": 1,
+    "email": "bob@example.com",
+    "firstName": "Bob",
+    "lastName": "Alison",
+    "shippingAddress": "Bob`s address"
+}
+```
+---
+
+`/api/auth/login` - *log in with registered user,  accessible forall users.*
+
+**Exemple link:**
+`http://localhost:8080/api/auth/login`
+
+**Exemple request:**
+```json
+{
+    "email": "bob@example.com",
+    "password": "12345678"
+}
+```
+**Response status**: 201
+
+**Exemple response:**
+```json
+{
+  "token": "UTJhbGciOiJIUzI1NiJ9.NyJzdWIiOiJib2JAZXhhbXBsZS5jb20iLCJpPOQiOjE3MDg1NTO3OTEsImV4cCI6MTcwODU1MTA5MX0.FQOptkrB5WwoFdEU7B7hi9S_AZEE5Kk927xUSBhJ4Oi"
+}
+```
+
+## Book
+
+### Get
+`/api/books` - *returns a list of all stored books accessible for roles User, Admin.*
+
+**Exemple link:**
+`http://localhost:8080/api/books`
+
+**Response status code**: 200
+
+**Exemple response:**
+```json
+{
+    "id": 1,
+    "title": "White Fang",
+    "author": "Jack London",
+    "isbn": "00000000000001",
+    "price": 19.90,
+    "description": "Book about adventure",
+    "coverImage": "http://example.com/whiteFang.jpg",
+    "categoryIds": [
+      1
+    ]
+}
+```
+---
+
+`/api/books/{id}` - *returns book by the specified id value accessible for roles User, Admin.*
+
+**Exemplary link:**
+`http://localhost:8080/api/books/1`
+
+**Response status code**: 200
+
+**Exemple response:**
+```json
+{
+    "id": 1,
+    "title": "White Fang",
+    "author": "Jack London",
+    "isbn": "00000000000001",
+    "price": 19.90,
+    "description": "Book about adventure",
+    "coverImage": "http://example.com/whiteFang.jpg",
+    "categoryIds": [
+      1
+    ]
+}
+```
+---
+
+`/api/books/search` - *searches books using specified parameters, accessible for roles User, Admin.*
+
+**Exemple link:**
+`http://localhost:8080/api/books/search?titles=White Fang&author=Jack London`
+
+**Response status code**: 200
+
+**Exemple response:**
+```json
+{
+    "id": 1,
+    "title": "White Fang",
+    "author": "Jack London",
+    "isbn": "00000000000001",
+    "price": 19.90,
+    "description": "Book about adventure",
+    "coverImage": "http://example.com/whiteFang.jpg",
+    "categoryIds": [
+      1
+    ]
+}
+```
+
+### Post
+`/api/books` - *creates a new book in the database, accessible for role Admin.*
+
+**Exemple request:**
+```json
+{
+    "title": "New book",
+    "author": "New author",
+    "isbn": "00000000000002",
+    "price": 29.99,
+    "description": "New description",
+    "coverImage": "https://example.com/updatedbook-cover-image.jpg"
+}
+```
+
+**Response status code**: 201
+
+**Exemplary response:**
+```json
+{
+    "id": 1,
+    "title": "New book",
+    "author": "New author",
+    "isbn": "00000000000002",
+    "price": 29.99,
+    "description": "New description",
+    "coverImage": "https://example.com/updatedbook-cover-image.jpg",
+    "categoryIds": []
+}
+```
+
+### Put
+`/api/books/{id}` - *updates the books with specified id, accessible for role Admin.* 
+
+**Exemple link:**
+`http://localhost:8080/api/books/1`
+
+**Response status code**: 202
+
+**Exemple request:**
+```json
+{
+    "title": "Shantaram",
+    "author": "Greg David Roberts",
+    "isbn": "00000000000003",
+    "price": 27.90,
+    "description": "Book about adventure",
+    "coverImage": "https://example.com/shantaram-cover-image.jpg"
+}
+```
+
+### Delete
+`/api/books/{id}` - soft-deletes from database a record with the specified id, accessible for role Admin.
+
+**Exemple link:**
+`http://localhost:8080/api/books/1`
+
+**Response status code**: 200
+
+
+
 
 ##  ❓ Challenges and Solutions 💪
 
