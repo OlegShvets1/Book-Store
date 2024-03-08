@@ -385,7 +385,7 @@ Exemple response:
 
 **Response status code**: 200
 
-Exemplary response:
+**Example response:**
 ```json
 [
     {
@@ -493,7 +493,7 @@ Exemplary response:
     "status": "DELIVERED"
 }
 ```
-## ShoppingCart 
+## 🛒 ShoppingCart 
 
 ### Get
 `/api/cart` - *returns Shopping Cart of logged-in user.*
@@ -558,6 +558,7 @@ Exemplary response:
 }
 ```
 **Response status code**: 202
+
 **Exqmple response:**
 ```json
 {
